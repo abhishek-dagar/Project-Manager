@@ -1,13 +1,35 @@
-import { TableCell, Typography, Stack, IconButton } from "@mui/material";
+import {
+  TableCell,
+  Typography,
+  Stack,
+  IconButton,
+  ListItemIcon,
+} from "@mui/material";
 import React from "react";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 const TableCells = (props) => {
+  const getItemStyle = (isDragging, draggableStyle) => {
+    const transform = draggableStyle.transform;
+    return {
+      ...draggableStyle,
+      transform:
+        transform &&
+        `translate(${transform.substring(
+          transform.indexOf("(") + 1,
+          transform.indexOf(",")
+        )},0)`,
+    };
+  };
   return (
     <TableCell
       ref={props.provided.innerRef}
       {...props.provided.draggableProps}
-      {...props.provided.dragHandleProps}
+      // {...props.provided.dragHandleProps}
+      style={getItemStyle(
+        props.snapshot.isDragging,
+        props.provided.draggableProps.style
+      )}
     >
       <Stack
         sx={{
@@ -18,23 +40,36 @@ const TableCells = (props) => {
           cursor: "pointer",
           height: "20px",
           borderRadius: "3px",
+          paddingLeft:"15px",
           "&:hover": {
             borderWidth: "0 1px",
             borderColor: "white",
             backgroundColor: "#4f5762",
+            paddingLeft:0,
+            "& .MuiListItemIcon-root":{
+              display:"flex",
+            }
           },
         }}
       >
-        <DragIndicatorIcon
-          tabIndex={-1}
+        <ListItemIcon
           sx={{
-            fontSize: "14px",
-            cursor: "move",
-            "&:focus": {
-              outline: "0",
-            },
+            display:"none",
+            minWidth: 15,
           }}
-        />
+          {...props.provided.dragHandleProps}
+        >
+          <DragIndicatorIcon
+            tabIndex={-1}
+            sx={{
+              fontSize: "14px",
+              cursor: "move",
+              "&:focus": {
+                outline: "0",
+              },
+            }}
+          />
+        </ListItemIcon>
         <Typography
           sx={{
             fontSize: "14px",

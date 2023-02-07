@@ -1,23 +1,42 @@
-import { TableRow, TableCell, ListItemIcon, Button } from "@mui/material";
+import {
+  TableRow,
+  TableCell,
+  ListItemIcon,
+  Button,
+  Stack,
+} from "@mui/material";
+
+import { useSelector } from "react-redux";
 
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 
 const TasksRow = ({ task, ta, tableColHeading, provided, snapshot }) => {
+  const { themeMode } = useSelector((state) => state.themeMode);
   function camelize(str) {
-    return str && str
-      .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
-        return index === 0 ? word.toLowerCase() : word.toUpperCase();
-      })
-      .replace(/\s+/g, "");
+    return (
+      str &&
+      str
+        .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+          return index === 0 ? word.toLowerCase() : word.toUpperCase();
+        })
+        .replace(/\s+/g, "")
+    );
   }
-  const getItemStyle = (isDragging, draggableStyle) => {
+  const getItemStyle = (snapshot, draggableStyle) => {
+    const transform = draggableStyle.transform;
     return {
       ...draggableStyle,
       userSelect: "none",
-      background: "#2a2e34",
-      opacity: isDragging && "0.7",
+      background: themeMode === "dark" && "#2a2e34",
+      opacity: snapshot.isDragging && "0.7",
       pointerEvents: "auto",
-      cursor: isDragging && "all-scroll",
+      cursor: snapshot.isDragging && "all-scroll",
+      transform:
+        transform &&
+        `translate(0, ${transform.substring(
+          transform.indexOf(",") + 1,
+          transform.indexOf(")")
+        )})`,
     };
   };
 
@@ -25,39 +44,64 @@ const TasksRow = ({ task, ta, tableColHeading, provided, snapshot }) => {
     <TableRow
       ref={provided.innerRef}
       {...provided.draggableProps}
-      style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+      style={getItemStyle(snapshot, provided.draggableProps.style)}
       sx={{
         "& .MuiTableCell-root": {
-          paddingBottom: "0",
+          padding: "8px 0 8px 0",
           borderBottom: "none !important",
+        },
+        "&:hover .MuiSvgIcon-root": {
+          display: "inline-block",
         },
       }}
     >
       <TableCell
         sx={{
+          width: "69.2%",
           position: "relative",
         }}
       >
-        <ListItemIcon
+        <Stack
           sx={{
             minWidth: 15,
+            width: 45,
+            height: 36,
             position: "absolute",
-            left: "-2.5%",
-            top: "12px",
+            // left: "-7%",
+            left: "-45px",
+            top: "0",
+            // backgroundColor:"red",
+            alignItems: "flex-end",
+            justifyContent: "flex-end",
+            "& .MuiSvgIcon-root": {
+              display: "none",
+            },
+            "&:hover .MuiSvgIcon-root": {
+              display: "inline-block",
+            },
           }}
-          {...provided.dragHandleProps}
         >
-          <DragIndicatorIcon
-            tabIndex={-1}
+          <ListItemIcon
             sx={{
-              fontSize: "20px",
-              cursor: "move",
-              "&:focus": {
-                outline: "0",
-              },
+              minWidth: 15,
+              height: 36,
+              alignItems: "center",
             }}
-          />
-        </ListItemIcon>
+            {...provided.dragHandleProps}
+          >
+            <DragIndicatorIcon
+              tabIndex={-1}
+              sx={{
+                height: "100%",
+                fontSize: "20px",
+                cursor: "move",
+                "&:focus": {
+                  outline: "0",
+                },
+              }}
+            />
+          </ListItemIcon>
+        </Stack>
         <Button
           sx={{
             backgroundColor: task.headingColor,

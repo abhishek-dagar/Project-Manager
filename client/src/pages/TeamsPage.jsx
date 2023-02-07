@@ -42,8 +42,12 @@ const TeamsPages = () => {
   const [tabAreaIndex, setTabAreaIndex] = useState(0);
   const [groupBy, setgroupBy] = useState("status");
 
+  const updateTasks=(tasks)=>{
+    setTasks(tasks);
+  }
+
   const TabArea = [
-    <TeamsGrid teams={teamsState} searchQuery={searchQuery} tasks={tasks} />,
+    <TeamsGrid teams={teamsState} searchQuery={searchQuery} tasks={tasks} updateTasks={updateTasks}/>,
     <TaskBoard searchQuery={searchQuery} />,
   ];
   const handleTabAreaIndex = (index) => {

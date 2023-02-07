@@ -12,6 +12,7 @@ import themeConfigs from "./configs/theme.config";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import AppLayout from "./components/layout/AppLayout";
+import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 import "swiper/css";
@@ -25,6 +26,16 @@ function App({ token }) {
   }, []);
   return (
     <ThemeProvider theme={themeConfigs.custom({ mode: themeMode })}>
+      <ToastContainer
+        position="bottom-left"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        pauseOnHover
+        theme={themeMode}
+      />
       {/* mui reset css */}
       <CssBaseline />
 

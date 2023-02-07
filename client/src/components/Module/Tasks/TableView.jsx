@@ -9,10 +9,7 @@ import {
   ListItemText,
   Stack,
   useTheme,
-  Button,
   Collapse,
-  Box,
-  ListItem,
 } from "@mui/material";
 
 import ExpandCircleDownOutlinedIcon from "@mui/icons-material/ExpandCircleDownOutlined";
@@ -60,7 +57,7 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
           }}
         >
           <Droppable
-            type={"HEADING"+taskKey+ind}
+            type={"HEADING" + taskKey + ind}
             droppableId={`Task-Heading-${taskKey}-${ind}`}
             direction="horizontal"
           >
@@ -68,7 +65,7 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
               <TableRow ref={provided.innerRef} {...provided.droppableProps}>
                 <TableCell
                   sx={{
-                    width: 712,
+                    width: "70%",
                   }}
                 >
                   <Stack
@@ -85,8 +82,7 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
                         padding: "4px 5px 4px 2px",
                         height: "22px",
                         "&:hover ": {
-                          backgroundColor:
-                            theme.mode === "dark" ? "#4f5762" : "transparent",
+                          backgroundColor:"transparent",
                         },
                       }}
                     >
@@ -137,7 +133,8 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
                     </ListItemButton>
                   </Stack>
                 </TableCell>
-                {open &&
+                {task.tasks.length > 0 &&
+                  open &&
                   tableColHeading.map((col, index) => {
                     return (
                       <Draggable
@@ -146,7 +143,12 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
                         index={index}
                       >
                         {(provided, snapshot) => (
-                          <TableCells provided={provided} key={col} id={col} />
+                          <TableCells
+                            provided={provided}
+                            snapshot={snapshot}
+                            key={col}
+                            id={col}
+                          />
                         )}
                       </Draggable>
                     );
@@ -161,38 +163,56 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
       <Collapse
         in={open}
         sx={{
-          marginLeft: "2.5%",
+          marginLeft: "23px",
         }}
       >
         <Droppable droppableId={`Task-List-${taskKey}-${ind}`} type="DATA">
-          {(provided, snapshot) => {
+          {(provided, _) => {
             return (
               <>
                 <Table ref={provided.innerRef} {...provided.droppableProps}>
                   <TableBody>
-                    {task.tasks.map((ta, index) => {
-                      return (
-                        <Draggable
-                          key={ta.id}
-                          draggableId={`List-${ta.id}-${index}`}
-                          index={index + 1}
-                        >
-                          {(provided, snapshot) => {
-                            return (
-                              <>
-                                <TasksRow
-                                  snapshot={snapshot}
-                                  provided={provided}
-                                  task={task}
-                                  ta={ta}
-                                  tableColHeading={tableColHeading}
-                                />
-                              </>
-                            );
-                          }}
-                        </Draggable>
-                      );
-                    })}
+                    {task.tasks.length > 0 ? (
+                      task.tasks.map((ta, index) => {
+                        return (
+                          <Draggable
+                            key={ta.id}
+                            draggableId={`List-${ta.id}-${index}`}
+                            index={index}
+                          >
+                            {(provided, snapshot) => {
+                              return (
+                                <>
+                                  <TasksRow
+                                    snapshot={snapshot}
+                                    provided={provided}
+                                    task={task}
+                                    ta={ta}
+                                    tableColHeading={tableColHeading}
+                                  />
+                                </>
+                              );
+                            }}
+                          </Draggable>
+                        );
+                      })
+                    ) : (
+                      <Draggable
+                        draggableId={`List-undefined-${ind}`}
+                        index={0}
+                        isDragDisabled
+                      >
+                        {(provided, _) => (
+                          <TableRow
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            sx={{
+                              height: "20px",
+                            }}
+                          />
+                        )}
+                      </Draggable>
+                    )}
                     {provided.placeholder}
                   </TableBody>
                 </Table>
