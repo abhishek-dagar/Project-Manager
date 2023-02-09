@@ -1,6 +1,3 @@
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { LoadingButton } from "@mui/lab";
 import {
   Alert,
   Box,
@@ -14,18 +11,25 @@ import {
   Avatar,
   FormHelperText,
 } from "@mui/material";
+
+import { LoadingButton } from "@mui/lab";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useSelector, useDispatch } from "react-redux";
+
 import { useState } from "react";
-import teamApi from "../../../api/modules/team.api";
-import { setTeamModal, setTeams } from "../../../redux/features/teamsSlice";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
+import { useFormik } from "formik";
+import * as Yup from "yup";
+
+import teamApi from "../../../api/modules/team.api";
+import { setTeamModal, setTeams } from "../../../redux/features/teamsSlice";
+
 const TeamForm = () => {
-  const { teams ,allMember } = useSelector((state) => state.teams);
+  const { teams, allMembers } = useSelector((state) => state.teams);
   const { user } = useSelector((state) => state.user);
 
-  const dispatch =useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [isCreateRequest, setIsCreateRequest] = useState(false);
@@ -51,9 +55,9 @@ const TeamForm = () => {
 
       if (response) {
         teamForm.resetForm();
-        dispatch(setTeams([...teams,response]));
+        dispatch(setTeams([...teams, response]));
         dispatch(setTeamModal(false));
-        navigate(`/teams/${response.id}`)
+        navigate(`/teams/${response.id}`);
         toast.success("Sign in success");
       }
 
@@ -112,7 +116,7 @@ const TeamForm = () => {
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {selected.map((value, index) => {
-                value = allMember.filter((member) => member.id === value);
+                value = allMembers.filter((member) => member.id === value);
                 const handleDelete = () => {
                   var memberArray = teamForm.values.members;
                   if (value) {
@@ -142,7 +146,7 @@ const TeamForm = () => {
             </Box>
           )}
         >
-          {allMember.map((member, index) => (
+          {allMembers.map((member, index) => (
             <MenuItem key={index} value={member.id}>
               {member.displayName}
             </MenuItem>

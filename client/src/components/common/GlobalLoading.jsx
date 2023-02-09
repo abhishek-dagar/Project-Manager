@@ -1,12 +1,17 @@
+import { Paper, Box, LinearProgress, useTheme } from "@mui/material";
+
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Paper, Box, LinearProgress, useTheme } from "@mui/material";
+
 import Logo from "./Logo";
 
 const GlobalLoading = () => {
   const theme = useTheme();
+
   const { globalLoad } = useSelector((state) => state.globalLoad);
+
   const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (globalLoad) {
       setIsLoading(true);
@@ -31,16 +36,20 @@ const GlobalLoading = () => {
         }}
       >
         <Box
-              sx={{
-                width: "100%",
-                height: "3%",
-                borderBottom: `1px solid ${theme.palette.borderColor.light}`,
-                backgroundColor: theme.palette.background.default,
-              }}
-            ></Box>
-        <LinearProgress sx={{
-          // marginTop:"45px"
-        }}/>
+          sx={{
+            width: "100%",
+            height: "3%",
+            borderBottom: `1px solid ${theme.palette.borderColor.light}`,
+            backgroundColor: theme.palette.background.default,
+          }}
+        ></Box>
+        <LinearProgress
+          sx={
+            {
+              // marginTop:"45px"
+            }
+          }
+        />
         <Box
           sx={{
             position: "absolute",
@@ -49,7 +58,7 @@ const GlobalLoading = () => {
             transform: "translate(-50%,-50%)",
           }}
         >
-          <Logo size={"3rem"}/>
+          <Logo size={"3rem"} />
         </Box>
       </Paper>
     </>

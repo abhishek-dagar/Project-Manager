@@ -1,42 +1,30 @@
-import {
-  Box,
-  Stack,
-  IconButton,
-  Divider,
-  useTheme,
-  Typography,
-  Button,
-} from "@mui/material";
-import Logo from "./Logo";
-import { useSelector, useDispatch } from "react-redux";
-import menuConfig from "../../configs/menu.config";
-import { Link } from "react-router-dom";
-import { themeModes } from "../../configs/theme.config";
-import { setThemeMode } from "../../redux/features/themeModeSlice";
-import { setUser } from "../../redux/features/userSlice";
+import { Box, Stack, IconButton, useTheme, Button } from "@mui/material";
+
+import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-import { setTeams } from "../../redux/features/teamsSlice";
-import { useNavigate } from "react-router-dom";
 
-const Sidebar = () => {
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+
+import { themeModes } from "../../configs/theme.config";
+import { setThemeMode } from "../../redux/features/themeModeSlice";
+import { setUser } from "../../redux/features/userSlice";
+import { setTeams } from "../../redux/features/teamsSlice";
+import Logo from "./Logo";
+
+import menuConfig from "../../configs/menu.config";
+
+const Sidebar = ({ sideBarOpen, changeSidebar, changeSidebarTemp }) => {
   const theme = useTheme();
-  const nav = useNavigate();
+
   const { appState } = useSelector((state) => state.appState);
   const { themeMode } = useSelector((state) => state.themeMode);
   const dispatch = useDispatch();
 
-  const getIconColor = (menu) => {
-    const dark = appState.includes(menu.state)
-      ? theme.palette.background.paper
-      : theme.palette.primary.main;
-    const light = appState.includes(menu.state)
-      ? "#fff"
-      : theme.palette.primary.contrastText;
-    return themeMode == themeModes.dark ? dark : light;
-  };
+  const nav = useNavigate();
 
   const onSwitchTheme = () => {
     const theme =
@@ -52,13 +40,36 @@ const Sidebar = () => {
   return (
     <Box
       width={"55px"}
+      onMouseEnter={changeSidebarTemp}
+      onMouseLeave={changeSidebarTemp}
       sx={{
         height: "100vh",
         borderRight: `1px solid ${theme.palette.borderColor.default}`,
         backgroundColor: theme.palette.background.paper,
         color: theme.palette.secondary.contrastText,
+        position: "relative",
       }}
     >
+      {!sideBarOpen && appState.includes("team") && (
+        <Button
+          onClick={changeSidebar}
+          sx={{
+            position: "absolute",
+            zIndex: "9999",
+            right: -15,
+            top: 45,
+            height: 25,
+            width: 25,
+            minWidth: 25,
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            borderRadius: "50%",
+            "&:hover": { backgroundColor: theme.palette.primary.main },
+          }}
+        >
+          {`>`}
+        </Button>
+      )}
       <Box
         textAlign="center"
         sx={{
@@ -99,14 +110,20 @@ const Sidebar = () => {
         </Stack>
         <Stack>
           <IconButton onClick={logout}>
-            <LogoutOutlinedIcon sx={{ color: "inherit", fontSize:"25px" }} />
+            <LogoutOutlinedIcon sx={{ color: "inherit", fontSize: "25px" }} />
           </IconButton>
           <IconButton sx={{ color: "inherit" }} onClick={onSwitchTheme}>
-            {themeMode === themeModes.dark && <WbSunnyOutlinedIcon sx={{ fontSize:"25px"}}/>}
-            {themeMode === themeModes.light && <DarkModeOutlinedIcon sx={{ fontSize:"25px"}}/>}
+            {themeMode === themeModes.dark && (
+              <WbSunnyOutlinedIcon sx={{ fontSize: "25px" }} />
+            )}
+            {themeMode === themeModes.light && (
+              <DarkModeOutlinedIcon sx={{ fontSize: "25px" }} />
+            )}
           </IconButton>
-          <IconButton >
-            <AccountCircleRoundedIcon sx={{ color: "inherit" , fontSize:"30px"}} />
+          <IconButton>
+            <AccountCircleRoundedIcon
+              sx={{ color: "inherit", fontSize: "30px" }}
+            />
           </IconButton>
         </Stack>
       </Stack>

@@ -33,6 +33,9 @@ const themeConfigs = {
               box:"#384047",
               topBar:"#3c414a",
             },
+            icon:{
+              default:"#979797",
+            },
           }
         : {
             primary: {
@@ -54,6 +57,9 @@ const themeConfigs = {
               light: "#b9bec7",
               box:"transparent",
               topBar:"#eeedef",
+            },
+            icon:{
+              default:"#979797",
             },
           };
     return createTheme({

@@ -1,28 +1,26 @@
-import {
-  AppBar,
-  Button,
-  Toolbar,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { AppBar, Button, Toolbar, Stack, Typography } from "@mui/material";
+
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import WbSunnyOutlinedIcon from "@mui/icons-material/WbSunnyOutlined";
+
+import { useSelector, useDispatch } from "react-redux";
+import ToggleSwitch from "./ToggleSwitch";
+
 import { themeModes } from "../../configs/theme.config";
 import { setThemeMode } from "../../redux/features/themeModeSlice";
-import {setUser} from "../../redux/features/userSlice";
-import { useSelector, useDispatch } from "react-redux";
+
 import {
   setAuthModalOpen,
   setSignInOrSignUp,
 } from "../../redux/features/authModalSlice";
 import Logo from "./Logo";
-import ToggleSwitch from "./ToggleSwitch";
-import { Link } from "react-router-dom";
 
 const Topbar = () => {
   const { user } = useSelector((state) => state.user);
   const { themeMode } = useSelector((state) => state.themeMode);
+
   const dispatch = useDispatch();
+
   const onSwitchTheme = () => {
     const theme =
       themeMode === themeModes.dark ? themeModes.light : themeModes.dark;
@@ -56,7 +54,7 @@ const Topbar = () => {
           }}
         >
           <Stack direction={"row"} spacing={1} alignItems="center">
-            <Logo size={"3.5rem"}/>
+            <Logo size={"3.5rem"} />
             <ToggleSwitch
               icon={<DarkModeOutlinedIcon />}
               checkedIcon={<WbSunnyOutlinedIcon />}

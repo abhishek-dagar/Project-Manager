@@ -1,7 +1,9 @@
 import { Box, Stack, Typography } from "@mui/material";
+
+import { useSelector } from "react-redux";
+
 import bgImg from "../assets/hero_section.png.webp";
 import { themeModes } from "../configs/theme.config";
-import { useSelector } from "react-redux";
 
 const Homepage = () => {
   const { themeMode } = useSelector((state) => state.themeMode);
@@ -51,7 +53,7 @@ const Homepage = () => {
           }}
         >
           <Box
-              data-aos="fade-right"
+            data-aos="fade-right"
             sx={{
               width: { xs: "80%", sm: "50%" },
               height: { xs: "25%", sm: "50%" },
@@ -81,7 +83,7 @@ const Homepage = () => {
             </Typography>
           </Box>
           <Box
-          data-aos="fade-left"
+            data-aos="fade-left"
             sx={{
               width: { xs: "80%", sm: "50%" },
               height: { xs: "25%", sm: "50%" },

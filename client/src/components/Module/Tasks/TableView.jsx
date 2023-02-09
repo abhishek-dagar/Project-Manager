@@ -10,18 +10,23 @@ import {
   Stack,
   useTheme,
   Collapse,
+  Box,
 } from "@mui/material";
 
 import ExpandCircleDownOutlinedIcon from "@mui/icons-material/ExpandCircleDownOutlined";
 import ExpandCircleDownRoundedIcon from "@mui/icons-material/ExpandCircleDownRounded";
+
 import { useState } from "react";
-import TableCells from "./TableCells";
-import TasksRow from "./TasksRow";
+
 import { Droppable } from "react-beautiful-dnd";
 import { Draggable } from "react-beautiful-dnd";
 
-const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
+import TableHeading from "./TableHeading";
+import TasksRow from "./TasksRow";
+
+const TableView = ({ task, tableColHeading, ind, taskKey }) => {
   const theme = useTheme();
+
   const [open, setOpen] = useState(true);
 
   const updateOpen = async () => {
@@ -42,7 +47,7 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
   };
 
   return (
-    <>
+    <Box marginLeft={"23px"}>
       <Table
         sx={{
           marginTop: "3%",
@@ -65,7 +70,9 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
               <TableRow ref={provided.innerRef} {...provided.droppableProps}>
                 <TableCell
                   sx={{
-                    width: "70%",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
                   <Stack
@@ -82,7 +89,7 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
                         padding: "4px 5px 4px 2px",
                         height: "22px",
                         "&:hover ": {
-                          backgroundColor:"transparent",
+                          backgroundColor: "transparent",
                         },
                       }}
                     >
@@ -90,6 +97,9 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
                         sx={{
                           marginRight: "6px",
                           minWidth: "6px",
+                          position: "absolute",
+                          top: 0,
+                          left: "-20px",
                         }}
                       >
                         {open ? (
@@ -143,7 +153,7 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
                         index={index}
                       >
                         {(provided, snapshot) => (
-                          <TableCells
+                          <TableHeading
                             provided={provided}
                             snapshot={snapshot}
                             key={col}
@@ -160,12 +170,7 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
         </TableHead>
       </Table>
 
-      <Collapse
-        in={open}
-        sx={{
-          marginLeft: "23px",
-        }}
-      >
+      <Collapse in={open}>
         <Droppable droppableId={`Task-List-${taskKey}-${ind}`} type="DATA">
           {(provided, _) => {
             return (
@@ -189,6 +194,7 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
                                     task={task}
                                     ta={ta}
                                     tableColHeading={tableColHeading}
+                                    taskKey={taskKey}
                                   />
                                 </>
                               );
@@ -221,7 +227,7 @@ const TableView = ({ task, tableColHeading, handleDragEnd, ind, taskKey }) => {
           }}
         </Droppable>
       </Collapse>
-    </>
+    </Box>
   );
 };
 

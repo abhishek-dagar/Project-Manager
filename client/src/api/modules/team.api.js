@@ -49,7 +49,6 @@ const teamApi = {
     }
   },
   createTeam: async (data) => {
-    console.log(data);
     try {
       const response = await privateClient.post(teamEndpoints.createTeam, data);
       return { response };

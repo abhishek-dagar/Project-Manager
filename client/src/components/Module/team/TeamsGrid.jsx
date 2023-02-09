@@ -1,8 +1,11 @@
 import { Stack, Box, useTheme } from "@mui/material";
-import ListView from "./ListView";
+
 import { useState } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
+
 import { toast } from "react-toastify";
+
+import ListView from "./ListView";
 
 const TeamsGrid = ({ teams, searchQuery, tasks, updateTasks }) => {
   const theme = useTheme();
@@ -32,18 +35,24 @@ const TeamsGrid = ({ teams, searchQuery, tasks, updateTasks }) => {
       );
       setTableColHeading(newHeadingArray);
     } else {
+      const newTaskObject = JSON.parse(JSON.stringify(tasks));
+
+      // Getting Source List
       var sourceList = source.droppableId.split("-").splice(2, 2);
-      var destinationList = destination.droppableId.split("-").splice(2, 2);
-      const newTaskObject = tasks;
       var sourceObject = newTaskObject[sourceList[0]][sourceList[1]];
-      var destinationObject =
-        newTaskObject[destinationList[0]][destinationList[1]];
-      destinationObject.tasks.splice(
-        destination.index,
-        0,
-        sourceObject.tasks[source.index]
-      );
-      sourceObject.tasks.splice(source.index, 1);
+      var sourceValue = sourceObject.tasks.splice(source.index, 1)[0];
+
+      // If source an destination in one tab
+      if (destination.droppableId === source.droppableId) {
+        sourceObject.tasks.splice(destination.index, 0, sourceValue);
+      }
+      // If source an destination in different tab
+      else {
+        var destinationList = destination.droppableId.split("-").splice(2, 2);
+        var destinationObject =
+          newTaskObject[destinationList[0]][destinationList[1]];
+        destinationObject.tasks.splice(destination.index, 0, sourceValue);
+      }
       updateTasks({ ...newTaskObject });
       toast.success("Task updated");
     }
@@ -79,7 +88,6 @@ const TeamsGrid = ({ teams, searchQuery, tasks, updateTasks }) => {
                 tasks={tasks[team.id]}
                 searchQuery={searchQuery}
                 tableColHeading={tableColHeading}
-                handleDragEnd={handleDragEnd}
               />
             </Stack>
           </Box>

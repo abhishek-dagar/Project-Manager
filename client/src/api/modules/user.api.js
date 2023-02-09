@@ -5,6 +5,7 @@ const userEndpoints = {
   signin: "user/signin",
   signup: "user/signup",
   getInfo: "user/info",
+  getMember: (id) => `user/getMemberDetails/${id}`,
 };
 
 const userApi = {
@@ -24,7 +25,15 @@ const userApi = {
   getInfo: async () => {
     try {
       const response = await privateClient.get(userEndpoints.getInfo);
-      
+
+      return { response };
+    } catch (err) {
+      return { err };
+    }
+  },
+  getMemberDetail: async (id) => {
+    try {
+      const response = await privateClient.get(userEndpoints.getMember(id));
       return { response };
     } catch (err) {
       return { err };

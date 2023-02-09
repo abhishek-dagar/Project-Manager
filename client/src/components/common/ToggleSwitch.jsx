@@ -1,8 +1,10 @@
 import { Switch, useTheme } from "@mui/material";
+
 import React from "react";
 
 const ToggleSwitch = ({ icon, checkedIcon, onChange }) => {
   const theme = useTheme();
+  
   return (
     <Switch
       onChange={onChange}
@@ -18,7 +20,7 @@ const ToggleSwitch = ({ icon, checkedIcon, onChange }) => {
           padding: 0,
           "& svg": {
             height: "25px",
-            transform:"rotate(360deg)",
+            transform: "rotate(360deg)",
             animation: "spin .5s linear",
             "@keyframes spin": {
               "0%": {

@@ -6,12 +6,15 @@ import {
   Box,
   Collapse,
 } from "@mui/material";
+
 import ExpandCircleDownOutlinedIcon from "@mui/icons-material/ExpandCircleDownOutlined";
 import ExpandCircleDownRoundedIcon from "@mui/icons-material/ExpandCircleDownRounded";
-import teamApi from "../../../api/modules/team.api";
+
 import { useEffect, useState } from "react";
-import TableView from "../Tasks/TableView";
 import { useSelector } from "react-redux";
+
+import TableView from "../Tasks/TableView";
+import teamApi from "../../../api/modules/team.api";
 
 const ListView = ({
   team,
@@ -21,6 +24,7 @@ const ListView = ({
   handleDragEnd,
 }) => {
   const { themeMode } = useSelector((state) => state.themeMode);
+
   const [open, setOpen] = useState(team.teamName ? team.view : false);
 
   const updateOpen = async () => {

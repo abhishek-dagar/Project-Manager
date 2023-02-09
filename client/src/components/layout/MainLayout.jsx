@@ -1,7 +1,9 @@
 import { Box } from "@mui/material";
+
 import { Outlet } from "react-router-dom";
-import AuthModal from "../common/AuthModel";
 import { useDispatch } from "react-redux";
+
+import AuthModal from "../common/AuthModel";
 import { setUser } from "../../redux/features/userSlice";
 import userApi from "../../api/modules/user.api";
 
@@ -11,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 const MainLayout = () => {
   const dispatch = useDispatch();
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,11 +23,12 @@ const MainLayout = () => {
       if (response) dispatch(setUser(response));
       if (err) {
         dispatch(setUser(null));
-        navigate("/")
+        navigate("/");
       }
     };
     authUser();
   }, [dispatch]);
+
   return (
     <>
       {/* auth modal */}

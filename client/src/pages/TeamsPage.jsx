@@ -27,14 +27,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import taskApi from "../api/modules/task.api";
 
 const TeamsPages = () => {
-  const { teamId } = useParams();
-  const { teams, allMember } = useSelector((state) => state.teams);
-  const { themeMode } = useSelector((state) => state.themeMode);
-  const navigate = useNavigate();
-
-  const dispatch = useDispatch();
   const theme = useTheme();
 
+  const { teams, allMembers } = useSelector((state) => state.teams);
+  const { themeMode } = useSelector((state) => state.themeMode);
+
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
+  const { teamId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [teamsState, setTeamsState] = useState(teams);
   const [tasks, setTasks] = useState({});
@@ -42,14 +44,20 @@ const TeamsPages = () => {
   const [tabAreaIndex, setTabAreaIndex] = useState(0);
   const [groupBy, setgroupBy] = useState("status");
 
-  const updateTasks=(tasks)=>{
+  const updateTasks = (tasks) => {
     setTasks(tasks);
-  }
+  };
 
   const TabArea = [
-    <TeamsGrid teams={teamsState} searchQuery={searchQuery} tasks={tasks} updateTasks={updateTasks}/>,
+    <TeamsGrid
+      teams={teamsState}
+      searchQuery={searchQuery}
+      tasks={tasks}
+      updateTasks={updateTasks}
+    />,
     <TaskBoard searchQuery={searchQuery} />,
   ];
+
   const handleTabAreaIndex = (index) => {
     setTabAreaIndex(index);
   };
@@ -62,7 +70,6 @@ const TeamsPages = () => {
     const getTeams = async () => {
       const { response, err } = await teamApi.getTeams();
 
-      // console.log(response,err);
       if (response) {
         dispatch(setTeams(response));
         setTeamsState(response);
@@ -99,7 +106,7 @@ const TeamsPages = () => {
   }, [teamId, groupBy]);
 
   return (
-    <Stack width={"90%"}>
+    <Stack width={"100%"}>
       <AppTopBar
         changeQuery={changeQuery}
         handleTabAreaIndex={handleTabAreaIndex}
@@ -171,7 +178,7 @@ const TeamsPages = () => {
             </Select>
           </Stack>
           <Stack direction={"row"} alignItems="center">
-            <Tooltip title={`${allMember.length} Members`}>
+            <Tooltip title={`${allMembers.length} Members`}>
               <AvatarGroup
                 max={2}
                 sx={{
@@ -185,8 +192,8 @@ const TeamsPages = () => {
                   },
                 }}
               >
-                {allMember &&
-                  allMember.map((member, index) => (
+                {allMembers &&
+                  allMembers.map((member, index) => (
                     <Avatar
                       key={index}
                       sx={{
