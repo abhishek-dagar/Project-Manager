@@ -28,56 +28,53 @@ const createTeam = async (req, res) => {
   }
 };
 
-const getAllMembers = async(req,res)=>{
-  try{
+const getAllMembers = async (req, res) => {
+  try {
+    const { id } = req.user;
 
-    const {id}=req.user;
-    
-    const members = await memberModel.find({manager:id});
+    const members = await memberModel.find({ manager: id });
 
-    if(members.length===0) return responseHandler.notfound(res);
-    
+    if (members.length === 0) return responseHandler.notfound(res);
 
     responseHandler.ok(res, members);
-  }catch{
+  } catch {
     responseHandler.error(res);
   }
-}
+};
 const getTeamMemberDetails = async (req, res) => {
   try {
     const teamsList = req.body;
-    
-    const teamMembersDetails = [];
+
+    const teamMembersDetails = {};
     for (let i = 0; i < teamsList.length; i++) {
       const { members } = teamsList[i];
-      const perTeamDetail=[]
+      const perTeamDetail = [];
       for (let j = 0; j < members.length; j++) {
         const memberId = members[j];
         const teamMemberDetails = await memberModel.findById(memberId);
-        perTeamDetail.push(teamMemberDetails)
+        perTeamDetail.push(teamMemberDetails);
       }
-      teamMembersDetails.push(perTeamDetail);
+      teamMembersDetails[teamsList[i].id]=perTeamDetail;
     }
 
     if (teamMembersDetails.length === 0) return responseHandler.notfound(res);
 
     responseHandler.ok(res, teamMembersDetails);
-  } catch (err){
-    
+  } catch (err) {
     responseHandler.error(res);
   }
 };
 
-const getTeam= async(req,res)=>{
-  try{
-    const {teamId} = req.params;
+const getTeam = async (req, res) => {
+  try {
+    const { teamId } = req.params;
     const team = await teamModel.findById(teamId);
-    if(!team) return responseHandler.notfound(res);
-    responseHandler.ok(res,team);
-  }catch{
+    if (!team) return responseHandler.notfound(res);
+    responseHandler.ok(res, team);
+  } catch {
     responseHandler.error(res);
   }
-}
+};
 
 const getTeams = async (req, res) => {
   try {
@@ -97,16 +94,16 @@ const getTeams = async (req, res) => {
   }
 };
 
-const updateView= async(req,res)=>{
-  try{
-    const {id,view} =req.body;
+const updateView = async (req, res) => {
+  try {
+    const { id, view } = req.body;
 
-    const team = await teamModel.findByIdAndUpdate(id,{view:view});
-    responseHandler.ok(res,team);
-  }catch{
-    responseHandler.error(res)
+    const team = await teamModel.findByIdAndUpdate(id, { view: view });
+    responseHandler.ok(res, team);
+  } catch {
+    responseHandler.error(res);
   }
-}
+};
 
 export default {
   createTeam,
@@ -114,5 +111,5 @@ export default {
   getTeamMemberDetails,
   getAllMembers,
   updateView,
-  getTeam
+  getTeam,
 };

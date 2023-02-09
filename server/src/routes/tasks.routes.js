@@ -27,4 +27,10 @@ router.get(
     tasksController.getTasks,
 )
 
+router.put(
+  "/updateTask",
+  tokenMiddleware.auth,
+  tasksController.updateTask,
+)
+
 export default router;

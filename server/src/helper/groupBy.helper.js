@@ -1,15 +1,6 @@
 const groupByHelper = {
   team: async (tasks) => {
     var groupTasks = {}
-    // tasks.reduce((acc,task)=>{
-    //   console.log(acc);
-    //   let id = task.team;
-    //   if(!acc[id]){
-    //     acc[id]=[];
-    //   }
-    //   acc[id].push(task);
-    //   return acc
-    // })
     if (tasks) {
       tasks.map((task) => {
         if (groupTasks[task.team]) {

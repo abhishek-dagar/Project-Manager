@@ -56,5 +56,7 @@ router.post(
 
 router.get("/info", tokenMiddleware.auth, userController.getInfo);
 
+router.get("/getMemberDetails/:memberId", tokenMiddleware.auth, userController.getMemberDetail);
+
 
 export default router;

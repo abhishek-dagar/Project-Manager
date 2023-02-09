@@ -59,12 +59,12 @@ const getTasks = async (req, res) => {
     if (!tasks) return responseHandler.notfound(res);
 
     const groupByTeam = await groupByHelper.team(tasks);
-    // if (teamId) {
-    //   const groupTask = await groupByHelper[groupBy]({
-    //     teamId: groupByTeam[teamId],
-    //   });
-    //   return responseHandler.ok(res, groupTask);
-    // }
+    if (teamId) {
+      const groupTask = await groupByHelper[groupBy]({
+        teamId: groupByTeam[teamId],
+      });
+      return responseHandler.ok(res, groupTask);
+    }
     const groupTask = await groupByHelper[groupBy](groupByTeam);
 
     // return responseHandler.ok(res, groupByTeam);
@@ -74,5 +74,29 @@ const getTasks = async (req, res) => {
     responseHandler.error(res);
   }
 };
+const updateTask = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const updateTask = req.body;
+    updateTask.id = null;
+    taskModel.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true },
+      function (err, task) {
+        if (err) {
+          responseHandler.error(res);
+        }
+        if (task) {
+          console.log(task);
+          responseHandler.ok(res, task);
+        }
+      }
+    );
+  } catch (err) {
+    console.log(err.message);
+    responseHandler.error(res);
+  }
+};
 
-export default { createTask, getTasks };
+export default { createTask, getTasks, updateTask };

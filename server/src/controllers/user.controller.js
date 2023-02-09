@@ -11,8 +11,7 @@ const signup = async (req, res) => {
     console.log(req.body);
 
     const checkUser = await managerModel.findOne({ email });
-    if (checkUser)
-      return responseHandler.badRequest(res, "email already use");
+    if (checkUser) return responseHandler.badRequest(res, "email already use");
 
     var user = undefined;
     if (designation === "MANAGER") {
@@ -92,16 +91,29 @@ const signIn = async (req, res) => {
 // getting user info
 const getInfo = async (req, res) => {
   try {
-    
     const manager = await managerModel.findById(req.user.id);
     const member = await memberModel.findById(req.user.id);
 
     if (!manager && !member) return responseHandler.notfound(res);
 
-    const user = manager?manager:member?member:null;
+    const user = manager ? manager : member ? member : null;
 
     responseHandler.ok(res, user);
   } catch {
+    responseHandler.error(res);
+  }
+};
+
+const getMemberDetail = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const member = await memberModel.findById(memberId);
+
+    if (!member) return responseHandler.notfound(res);
+
+    responseHandler.ok(res, member);
+  } catch (err) {
+    console.log(err.message);
     responseHandler.error(res);
   }
 };
@@ -110,4 +122,5 @@ export default {
   signIn,
   signup,
   getInfo,
+  getMemberDetail,
 };
