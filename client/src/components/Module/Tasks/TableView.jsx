@@ -23,9 +23,12 @@ import { Draggable } from "react-beautiful-dnd";
 
 import TableHeading from "./TableHeading";
 import TasksRow from "./TasksRow";
+import { useSelector } from "react-redux";
 
-const TableView = ({ task, tableColHeading, ind, taskKey }) => {
+const TableView = ({ task, tableColHeading, ind, taskKey, groupBy }) => {
   const theme = useTheme();
+
+  const {allMembers} = useSelector(state=>state.teams)
 
   const [open, setOpen] = useState(true);
 
@@ -34,7 +37,7 @@ const TableView = ({ task, tableColHeading, ind, taskKey }) => {
   };
 
   const checkBgColor = () => {
-    if (task.groupHeading) {
+    if (task.headingColor) {
       var rgbValue = task.headingColor.substr(1);
       var r = parseInt(rgbValue.substring(0, 2), 16);
       var g = parseInt(rgbValue.substring(2, 4), 16);
@@ -184,6 +187,7 @@ const TableView = ({ task, tableColHeading, ind, taskKey }) => {
                             key={ta.id}
                             draggableId={`List-${ta.id}-${index}`}
                             index={index}
+                            isDragDisabled={groupBy.toLowerCase() === "none"}
                           >
                             {(provided, snapshot) => {
                               return (
@@ -195,6 +199,7 @@ const TableView = ({ task, tableColHeading, ind, taskKey }) => {
                                     ta={ta}
                                     tableColHeading={tableColHeading}
                                     taskKey={taskKey}
+                                    groupBy={groupBy}
                                   />
                                 </>
                               );

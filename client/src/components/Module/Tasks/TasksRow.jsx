@@ -16,11 +16,13 @@ import FlagIcon from "@mui/icons-material/Flag";
 import CancelIcon from "@mui/icons-material/Cancel";
 
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import IconButton from "../../common/IconBtn";
 import userApi from "../../../api/modules/user.api";
+import taskApi from "../../../api/modules/task.api";
 import DropdownMenu from "../../common/DropdownMenu";
+import { setAllTasks } from "../../../redux/features/teamsSlice";
 
 const TasksRow = ({
   task,
@@ -29,9 +31,12 @@ const TasksRow = ({
   provided,
   snapshot,
   taskKey,
+  groupBy,
 }) => {
   const { themeMode } = useSelector((state) => state.themeMode);
-  const { teamsMembersDetail } = useSelector((state) => state.teams);
+  const { teamsMembersDetail, allTasks } = useSelector((state) => state.teams);
+
+  const dispatch = useDispatch();
 
   const [assignee, setAssignee] = useState();
   const [priority, setPriority] = useState();
@@ -59,8 +64,65 @@ const TasksRow = ({
   const handleCloseAssignee = () => {
     setAnchorElAssignee(null);
   };
-  const setAssigneeState = (value) => {
+  const setAssigneeState = async (value) => {
     setAssignee(value);
+    if (groupBy === "Assignee") {
+      const newAllTaskObject = JSON.parse(JSON.stringify(allTasks));
+      const newTaskObject = JSON.parse(JSON.stringify(task));
+      const newTaObject = JSON.parse(JSON.stringify(ta));
+      const index = task.tasks.indexOf(ta);
+
+      newTaObject.assignee = value ? value.id : null;
+
+      newTaskObject.tasks.splice(index, 1);
+
+      var flag = false;
+      var ind = -1;
+      var indexTask = -1;
+      newAllTaskObject[taskKey].map((task, index) => {
+        if (value && value.id === task.groupKey) {
+          flag = true;
+          ind = index;
+          return;
+        }
+        if (!value && !task.groupKey) {
+          flag = true;
+          ind = index;
+        }
+      });
+
+      newAllTaskObject[taskKey].map((task, index) => {
+        if (newTaskObject.groupKey === task.groupKey) {
+          indexTask = index;
+          return;
+        }
+      });
+
+      if (flag) {
+        console.log(ind);
+        newAllTaskObject[taskKey][ind].tasks.push(newTaObject);
+        if (newTaskObject.tasks.length === 0) {
+          newAllTaskObject[taskKey].splice(indexTask, 1);
+        } else {
+          newAllTaskObject[taskKey].splice(indexTask, 1, newTaskObject);
+        }
+      } else {
+        newAllTaskObject[taskKey].splice(indexTask, 1, newTaskObject);
+        newAllTaskObject[taskKey].push({
+          groupHeading: value.displayName,
+          groupKey: value.id || null,
+          tasks: [newTaObject],
+        });
+      }
+
+      console.log("-->", newAllTaskObject);
+
+      dispatch(setAllTasks(newAllTaskObject));
+      const { err } = await taskApi.updateTask(newTaObject);
+      if (err) {
+        dispatch(setAllTasks({}));
+      }
+    }
   };
   const handleClickPriority = (event) => {
     setAnchorElPriority(event.currentTarget);
@@ -179,29 +241,31 @@ const TasksRow = ({
             }}
             {...provided.dragHandleProps}
           >
-            <DragIndicatorIcon
-              tabIndex={-1}
-              sx={{
-                height: "100%",
-                fontSize: "20px",
-                cursor: "move",
-                "&:focus": {
-                  outline: "0",
-                },
-              }}
-            />
+            {groupBy.toLowerCase() !== "none" && (
+              <DragIndicatorIcon
+                tabIndex={-1}
+                sx={{
+                  height: "100%",
+                  fontSize: "20px",
+                  cursor: "move",
+                  "&:focus": {
+                    outline: "0",
+                  },
+                }}
+              />
+            )}
           </ListItemIcon>
         </Stack>
         <Button
           onClick={() => console.log("Status")}
           sx={{
-            backgroundColor: task.headingColor,
+            backgroundColor: ta.statusColor,
             height: 12,
             minWidth: 12,
             margin: "0 11px",
             padding: 0,
             "&:hover": {
-              backgroundColor: task.headingColor,
+              backgroundColor: ta.statusColor,
             },
           }}
         />

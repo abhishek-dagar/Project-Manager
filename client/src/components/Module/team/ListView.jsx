@@ -22,6 +22,7 @@ const ListView = ({
   searchQuery,
   tableColHeading,
   handleDragEnd,
+  groupBy
 }) => {
   const { themeMode } = useSelector((state) => state.themeMode);
 
@@ -112,6 +113,7 @@ const ListView = ({
                   taskKey={team.id}
                   tableColHeading={tableColHeading}
                   handleDragEnd={handleDragEnd}
+                  groupBy={groupBy}
                 />
               );
             })}

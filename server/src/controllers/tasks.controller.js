@@ -1,6 +1,5 @@
 import responseHandler from "../handlers/response.handler.js";
 import taskModel from "../models/task.model.js";
-import groupByHelper from "../helper/groupBy.helper.js";
 
 const createTask = async (req, res) => {
   try {
@@ -48,7 +47,6 @@ const createTask = async (req, res) => {
 const getTasks = async (req, res) => {
   try {
     const { id, designation, manager } = req.user;
-    const { groupBy, teamId } = req.params;
 
     var tasks;
     if (designation === "MANAGER") {
@@ -58,17 +56,7 @@ const getTasks = async (req, res) => {
     }
     if (!tasks) return responseHandler.notfound(res);
 
-    const groupByTeam = await groupByHelper.team(tasks);
-    if (teamId) {
-      const groupTask = await groupByHelper[groupBy]({
-        teamId: groupByTeam[teamId],
-      });
-      return responseHandler.ok(res, groupTask);
-    }
-    const groupTask = await groupByHelper[groupBy](groupByTeam);
-
-    // return responseHandler.ok(res, groupByTeam);
-    return responseHandler.ok(res, groupTask);
+    return responseHandler.ok(res, tasks);
   } catch (err) {
     console.log(err.message);
     responseHandler.error(res);
@@ -78,17 +66,17 @@ const updateTask = async (req, res) => {
   try {
     const { id } = req.body;
     const updateTask = req.body;
-    updateTask.id = null;
+    updateTask.id = undefined;
     taskModel.findByIdAndUpdate(
       id,
-      req.body,
+      {...req.body},
       { new: true },
       function (err, task) {
         if (err) {
           responseHandler.error(res);
         }
         if (task) {
-          console.log(task);
+          // console.log(task);
           responseHandler.ok(res, task);
         }
       }

@@ -6,6 +6,7 @@ export const teamSlice = createSlice({
     teams: [],
     teamsMembersDetail: {},
     allMembers: [],
+    allTasks:{},
     teamModal: false,
   },
   reducers: {
@@ -18,6 +19,9 @@ export const teamSlice = createSlice({
     setAllMember: (state, action) => {
       state.allMembers = action.payload;
     },
+    setAllTasks: (state, action) => {
+      state.allTasks = action.payload;
+    },
     setTeamModal: (state, action) => {
       state.teamModal = action.payload;
     },
@@ -29,6 +33,7 @@ export const {
   setTeamsMembersDetail,
   setAllMember,
   setTeamModal,
+  setAllTasks,
 } = teamSlice.actions;
 
 export default teamSlice.reducer;

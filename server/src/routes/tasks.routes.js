@@ -15,22 +15,8 @@ router.post(
   tasksController.createTask
 );
 
-router.get(
-    "/getTasks/:groupBy",
-    tokenMiddleware.auth,
-    tasksController.getTasks,
-)
+router.get("/getTasks", tokenMiddleware.auth, tasksController.getTasks);
 
-router.get(
-    "/getTasks/:groupBy/:teamId",
-    tokenMiddleware.auth,
-    tasksController.getTasks,
-)
-
-router.put(
-  "/updateTask",
-  tokenMiddleware.auth,
-  tasksController.updateTask,
-)
+router.put("/updateTask", tokenMiddleware.auth, tasksController.updateTask);
 
 export default router;

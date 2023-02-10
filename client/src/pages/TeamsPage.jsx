@@ -21,15 +21,16 @@ import { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 
-import { setTeamModal, setTeams } from "../redux/features/teamsSlice";
+import { setTeamModal, setTeams, setAllTasks } from "../redux/features/teamsSlice";
 import TaskBoard from "../components/common/TaskBoard";
 import { useNavigate, useParams } from "react-router-dom";
 import taskApi from "../api/modules/task.api";
+import groupByHelper from "../Helper/groupBy.helper";
 
 const TeamsPages = () => {
   const theme = useTheme();
 
-  const { teams, allMembers } = useSelector((state) => state.teams);
+  const { teams, allMembers, allTasks } = useSelector((state) => state.teams);
   const { themeMode } = useSelector((state) => state.themeMode);
 
   const dispatch = useDispatch();
@@ -39,24 +40,24 @@ const TeamsPages = () => {
   const { teamId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [teamsState, setTeamsState] = useState(teams);
-  const [tasks, setTasks] = useState({});
 
   const [tabAreaIndex, setTabAreaIndex] = useState(0);
-  const [groupBy, setgroupBy] = useState("status");
+  const [groupBy, setGroupBy] = useState("status");
 
-  const updateTasks = (tasks) => {
-    setTasks(tasks);
-  };
 
   const TabArea = [
     <TeamsGrid
       teams={teamsState}
       searchQuery={searchQuery}
-      tasks={tasks}
-      updateTasks={updateTasks}
+      tasks={allTasks}
+      groupBy={groupBy}
     />,
     <TaskBoard searchQuery={searchQuery} />,
   ];
+
+  const handleGroupBy=(event)=>{
+    setGroupBy(event.target.value)
+  }
 
   const handleTabAreaIndex = (index) => {
     setTabAreaIndex(index);
@@ -78,11 +79,14 @@ const TeamsPages = () => {
     };
 
     const getTasks = async () => {
-      const { response, err } = await taskApi.getTasks(groupBy);
+      const { response, err } = await taskApi.getTasks();
       if (response) {
-        setTasks(response);
+        const groupByTeam = await groupByHelper.team(response);
+        const groupTask = await groupByHelper[groupBy.toLowerCase()]({tasks:groupByTeam,allMembers});
+        dispatch(setAllTasks(groupTask));
       }
       if (err) {
+        dispatch(setAllTasks({}));
         dispatch(setTeams([]));
       }
     };
@@ -160,6 +164,7 @@ const TeamsPages = () => {
               defaultValue={"Status"}
               variant="standard"
               disableUnderline
+              onChange={handleGroupBy}
               inputProps={{
                 name: "age",
                 id: "uncontrolled-native",
@@ -168,6 +173,9 @@ const TeamsPages = () => {
                 fontSize: "12px",
                 "& ": {
                   padding: "10px",
+                },
+                "& .MuiSelect-select:focus": {
+                  backgroundColor: "transparent",
                 },
               }}
             >

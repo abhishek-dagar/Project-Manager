@@ -1,14 +1,23 @@
 import privateClient from "../client/private.client";
 
 const taskEndpoints = {
-  getTasks: (groupBy) => `tasks/getTasks/${groupBy}`,
-  getTasksForTeams: (groupBy, teamId) => `tasks/getTasks/${groupBy}/${teamId}`,
+  getTasks: `tasks/getTasks`,
+  updateTask: `tasks/updateTask`,
 };
 
-const teamApi = {
-  getTasks: async (groupBy) => {
+const taskApi = {
+  getTasks: async () => {
     try {
-      const response = await privateClient.get(taskEndpoints.getTasks(groupBy));
+      const response = await privateClient.get(taskEndpoints.getTasks);
+      return { response };
+    } catch (err) {
+      return { err };
+    }
+  },
+  updateTask: async (data) => {
+    try {
+      const response = await privateClient.put(taskEndpoints.updateTask, data);
+
       return { response };
     } catch (err) {
       return { err };
@@ -16,4 +25,4 @@ const teamApi = {
   },
 };
 
-export default teamApi;
+export default taskApi;
