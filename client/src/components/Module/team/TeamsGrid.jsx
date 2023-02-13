@@ -31,10 +31,6 @@ const TeamsGrid = ({ teams, searchQuery, tasks, groupBy }) => {
       destination.index === source.index
     )
       return;
-    // if (groupBy.toLowerCase() === "none") {
-    //   toast.error("Cannot move task to another team");
-    //   return;
-    // }
     const draggableIdList = draggableId.split("-");
     if (draggableIdList[0] === "Heading") {
       const newHeadingArray = Array.from(tableColHeading);

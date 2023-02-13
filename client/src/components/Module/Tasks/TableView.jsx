@@ -23,12 +23,17 @@ import { Draggable } from "react-beautiful-dnd";
 
 import TableHeading from "./TableHeading";
 import TasksRow from "./TasksRow";
-import { useSelector } from "react-redux";
 
-const TableView = ({ task, tableColHeading, ind, taskKey, groupBy }) => {
+const TableView = ({
+  task,
+  tableColHeading,
+  ind,
+  taskKey,
+  groupBy,
+  searchQuery,
+  allStatus
+}) => {
   const theme = useTheme();
-
-  const {allMembers} = useSelector(state=>state.teams)
 
   const [open, setOpen] = useState(true);
 
@@ -44,7 +49,9 @@ const TableView = ({ task, tableColHeading, ind, taskKey, groupBy }) => {
       var b = parseInt(rgbValue.substring(4, 6), 16);
       var brightness = r * 0.299 + g * 0.587 + b * 0.114;
 
-      return brightness > 186 ? "#343434" : theme.palette.primary.contrastText;
+      return brightness > 186 || brightness < 40
+        ? "#343434"
+        : theme.palette.primary.contrastText;
     }
     return theme.palette.primary.contrastText;
   };
@@ -69,7 +76,7 @@ const TableView = ({ task, tableColHeading, ind, taskKey, groupBy }) => {
             droppableId={`Task-Heading-${taskKey}-${ind}`}
             direction="horizontal"
           >
-            {(provided, snapshot) => (
+            {(provided, _) => (
               <TableRow ref={provided.innerRef} {...provided.droppableProps}>
                 <TableCell
                   sx={{
@@ -182,6 +189,8 @@ const TableView = ({ task, tableColHeading, ind, taskKey, groupBy }) => {
                   <TableBody>
                     {task.tasks.length > 0 ? (
                       task.tasks.map((ta, index) => {
+                        if (!ta.taskName.toLowerCase().includes(searchQuery))
+                          return;
                         return (
                           <Draggable
                             key={ta.id}
@@ -200,6 +209,7 @@ const TableView = ({ task, tableColHeading, ind, taskKey, groupBy }) => {
                                     tableColHeading={tableColHeading}
                                     taskKey={taskKey}
                                     groupBy={groupBy}
+                                    allStatus={allStatus}
                                   />
                                 </>
                               );

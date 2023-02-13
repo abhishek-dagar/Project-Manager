@@ -27,6 +27,8 @@ const DropdownMenu = ({
   sx,
   sxMenuList,
   sxMenu,
+  sxIcon,
+  sxMenuItem,
   divider,
   avatarIcon,
   colors,
@@ -117,19 +119,22 @@ const DropdownMenu = ({
                 avatar_color={colors ? colors[index] : ""}
                 transparent
                 icon_color={icon_color && icon_color[index]}
+                sxIcon={sxIcon}
                 sx={{
                   minWidth: "40px",
-                  height: "44px",
+                  height: sxIcon?"40px":"44px",
                 }}
               />
               <MenuItem
                 sx={{
                   paddingLeft: 0,
                   width: "100%",
+                  alignItems:"center",
                   "&:hover": {
                     backgroundColor: "#2a2e34",
                     borderRadius: "6px",
                   },
+                  ...sxMenuItem,
                 }}
               >
                 {item.displayName ? item.displayName : item}

@@ -16,6 +16,11 @@ const createTeam = async (req, res) => {
     team.manager = managerId;
     team.members = members;
     team.teamName = teamName;
+    team.allStatus = {
+      "TO DO": "#d3d3d3",
+      "IN PROGRESS": "#a875ff",
+      COMPLETE: "#6bc950",
+    };
 
     await team.save();
 
@@ -54,7 +59,7 @@ const getTeamMemberDetails = async (req, res) => {
         const teamMemberDetails = await memberModel.findById(memberId);
         perTeamDetail.push(teamMemberDetails);
       }
-      teamMembersDetails[teamsList[i].id]=perTeamDetail;
+      teamMembersDetails[teamsList[i].id] = perTeamDetail;
     }
 
     if (teamMembersDetails.length === 0) return responseHandler.notfound(res);

@@ -21,7 +21,11 @@ import { useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 
-import { setTeamModal, setTeams, setAllTasks } from "../redux/features/teamsSlice";
+import {
+  setTeamModal,
+  setTeams,
+  setAllTasks,
+} from "../redux/features/teamsSlice";
 import TaskBoard from "../components/common/TaskBoard";
 import { useNavigate, useParams } from "react-router-dom";
 import taskApi from "../api/modules/task.api";
@@ -44,7 +48,6 @@ const TeamsPages = () => {
   const [tabAreaIndex, setTabAreaIndex] = useState(0);
   const [groupBy, setGroupBy] = useState("status");
 
-
   const TabArea = [
     <TeamsGrid
       teams={teamsState}
@@ -55,9 +58,9 @@ const TeamsPages = () => {
     <TaskBoard searchQuery={searchQuery} />,
   ];
 
-  const handleGroupBy=(event)=>{
-    setGroupBy(event.target.value)
-  }
+  const handleGroupBy = (event) => {
+    setGroupBy(event.target.value);
+  };
 
   const handleTabAreaIndex = (index) => {
     setTabAreaIndex(index);
@@ -68,21 +71,19 @@ const TeamsPages = () => {
   };
 
   useEffect(() => {
-    const getTeams = async () => {
-      const { response, err } = await teamApi.getTeams();
-
-      if (response) {
-        dispatch(setTeams(response));
-        setTeamsState(response);
-      }
-      if (err) dispatch(setTeams([]));
+    const getTeams = () => {
+      setTeamsState(teams);
     };
 
     const getTasks = async () => {
       const { response, err } = await taskApi.getTasks();
       if (response) {
         const groupByTeam = await groupByHelper.team(response);
-        const groupTask = await groupByHelper[groupBy.toLowerCase()]({tasks:groupByTeam,allMembers});
+        const groupTask = await groupByHelper[groupBy.toLowerCase()]({
+          tasks: groupByTeam,
+          allMembers,
+          teams,
+        });
         dispatch(setAllTasks(groupTask));
       }
       if (err) {
@@ -107,7 +108,7 @@ const TeamsPages = () => {
       getTeams();
     }
     getTasks();
-  }, [teamId, groupBy]);
+  }, [teamId, groupBy, teams]);
 
   return (
     <Stack width={"100%"}>
@@ -120,7 +121,14 @@ const TeamsPages = () => {
           padding: "10px 17px 10px 30px",
         }}
       >
-        <Stack direction={"row"} position={"relative"} alignItems="center">
+        <Stack
+          direction={"row"}
+          sx={{
+            position: "relative",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Stack
             sx={{
               flexDirection: "row",
@@ -142,124 +150,127 @@ const TeamsPages = () => {
               placeholder="search"
               variant="standard"
               onChange={changeQuery}
+              autoComplete={"off"}
               size="small"
             />
           </Stack>
-          <Stack
-            sx={{
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              width: "146px",
-              fontSize: "12px",
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                border: "1px solid #484850",
-                borderRadius: "5px 5px 0 0",
-                backgroundColor: "transparent",
-              },
-            }}
-          >
-            <Typography fontSize="12px">Group by:</Typography>
-            <Select
-              defaultValue={"Status"}
-              variant="standard"
-              disableUnderline
-              onChange={handleGroupBy}
-              inputProps={{
-                name: "age",
-                id: "uncontrolled-native",
-              }}
+          <Stack direction={"row"}>
+            <Stack
               sx={{
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                width: "146px",
                 fontSize: "12px",
-                "& ": {
-                  padding: "10px",
-                },
-                "& .MuiSelect-select:focus": {
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  border: "1px solid #484850",
+                  borderRadius: "5px 5px 0 0",
                   backgroundColor: "transparent",
                 },
               }}
             >
-              <MenuItem value={"Status"}>Status</MenuItem>
-              <MenuItem value={"Assignee"}>Assignee</MenuItem>
-              <MenuItem value={"Priority"}>Priority</MenuItem>
-              <MenuItem value={"None"}>None</MenuItem>
-            </Select>
-          </Stack>
-          <Stack direction={"row"} alignItems="center">
-            <Tooltip title={`${allMembers.length} Members`}>
-              <AvatarGroup
-                max={2}
-                sx={{
-                  marginLeft: "15px",
-                  "& .MuiAvatar-root": {
-                    width: 15,
-                    height: 15,
-                    fontSize: 15,
-                    padding: "8px",
-                    color: theme.palette.secondary.contrastText,
-                  },
+              <Typography fontSize="12px">Group by:</Typography>
+              <Select
+                defaultValue={"Status"}
+                variant="standard"
+                disableUnderline
+                onChange={handleGroupBy}
+                inputProps={{
+                  name: "age",
+                  id: "uncontrolled-native",
                 }}
-              >
-                {allMembers &&
-                  allMembers.map((member, index) => (
-                    <Avatar
-                      key={index}
-                      sx={{
-                        backgroundColor: theme.palette.primary.main,
-                        padding: "4px",
-                        color: theme.palette.secondary.contrastText,
-                      }}
-                    >
-                      {member.displayName[0]}
-                    </Avatar>
-                  ))}
-              </AvatarGroup>
-            </Tooltip>
-            <Tooltip title="Add member">
-              <IconButton
                 sx={{
-                  borderRadius: 0,
-                  fontSize: "11px",
-                  color: theme.palette.secondary.contrastText,
-                  padding: "4px",
-                  "&:hover": {
+                  fontSize: "12px",
+                  "& ": {
+                    padding: "10px",
+                  },
+                  "& .MuiSelect-select:focus": {
                     backgroundColor: "transparent",
                   },
                 }}
               >
-                <Avatar
+                <MenuItem value={"Status"}>Status</MenuItem>
+                <MenuItem value={"Assignee"}>Assignee</MenuItem>
+                <MenuItem value={"Priority"}>Priority</MenuItem>
+                <MenuItem value={"None"}>None</MenuItem>
+              </Select>
+            </Stack>
+            <Stack direction={"row"} alignItems="center">
+              <Tooltip title={`${allMembers.length} Members`}>
+                <AvatarGroup
+                  max={2}
                   sx={{
-                    // backgroundColor: "transparent",
-                    width: 30,
-                    height: 30,
-                    fontSize: 20,
-                    color: theme.palette.secondary.contrastText,
+                    marginLeft: "15px",
+                    "& .MuiAvatar-root": {
+                      width: 15,
+                      height: 15,
+                      fontSize: 15,
+                      padding: "8px",
+                      color: theme.palette.secondary.contrastText,
+                    },
                   }}
                 >
-                  <PersonAddAltOutlinedIcon fontSize="small" />
-                </Avatar>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Add team">
-              <Button
-                // variant="contained"
-                onClick={() => dispatch(setTeamModal(true))}
-                sx={{
-                  border: `1px solid ${theme.palette.borderColor.light}`,
-                  borderRadius: "4px",
-                  padding: "0 15px",
-                  margin: "7px 12px 7px 12px",
-                  height: "30px",
-                  color: theme.palette.secondary.contrastText,
-                  "&:hover": {
-                    backgroundColor:
-                      themeMode === "dark" ? "#ffffff14" : "#0000000a",
-                  },
-                }}
-              >
-                <AddIcon sx={{ fontSize: "medium" }} /> Team
-              </Button>
-            </Tooltip>
+                  {allMembers &&
+                    allMembers.map((member, index) => (
+                      <Avatar
+                        key={index}
+                        sx={{
+                          backgroundColor: theme.palette.primary.main,
+                          padding: "4px",
+                          color: theme.palette.secondary.contrastText,
+                        }}
+                      >
+                        {member.displayName[0]}
+                      </Avatar>
+                    ))}
+                </AvatarGroup>
+              </Tooltip>
+              <Tooltip title="Add member">
+                <IconButton
+                  sx={{
+                    borderRadius: 0,
+                    fontSize: "11px",
+                    color: theme.palette.secondary.contrastText,
+                    padding: "4px",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      // backgroundColor: "transparent",
+                      width: 30,
+                      height: 30,
+                      fontSize: 20,
+                      color: theme.palette.secondary.contrastText,
+                    }}
+                  >
+                    <PersonAddAltOutlinedIcon fontSize="small" />
+                  </Avatar>
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Add team">
+                <Button
+                  // variant="contained"
+                  onClick={() => dispatch(setTeamModal(true))}
+                  sx={{
+                    border: `1px solid ${theme.palette.borderColor.light}`,
+                    borderRadius: "4px",
+                    padding: "0 15px",
+                    margin: "7px 12px 7px 12px",
+                    height: "30px",
+                    color: theme.palette.secondary.contrastText,
+                    "&:hover": {
+                      backgroundColor:
+                        themeMode === "dark" ? "#ffffff14" : "#0000000a",
+                    },
+                  }}
+                >
+                  <AddIcon sx={{ fontSize: "medium" }} /> Team
+                </Button>
+              </Tooltip>
+            </Stack>
           </Stack>
         </Stack>
       </Box>
@@ -278,7 +289,7 @@ const TeamsPages = () => {
           "&::-webkit-scrollbar-thumb": {
             backgroundColor: "#babac080",
             borderRadius: "16px",
-            border: `5px solid ${theme.palette.borderColor.default}`,
+            border: `5px solid ${theme.palette.background.default}`,
           },
         }}
       >

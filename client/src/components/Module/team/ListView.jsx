@@ -22,7 +22,7 @@ const ListView = ({
   searchQuery,
   tableColHeading,
   handleDragEnd,
-  groupBy
+  groupBy,
 }) => {
   const { themeMode } = useSelector((state) => state.themeMode);
 
@@ -36,7 +36,30 @@ const ListView = ({
 
   useEffect(() => {
     setOpen(team.view);
-  }, [team]);
+    if (searchQuery !== "") {
+      let flag = true;
+      if (tasks) {
+        let count = 0;
+        tasks.map((task) => {
+          if (task.tasks.length > 0) {
+            task.tasks.map((ta) => {
+              if (ta.taskName.toLowerCase().includes(searchQuery)) {
+                count++;
+              }
+            });
+          }
+        });
+        if (count === 0) {
+          flag = false;
+        }
+      }
+      if (flag) {
+        setOpen(true);
+      } else {
+        setOpen(false);
+      }
+    }
+  }, [team, searchQuery]);
 
   return team ? (
     <Stack
@@ -114,6 +137,8 @@ const ListView = ({
                   tableColHeading={tableColHeading}
                   handleDragEnd={handleDragEnd}
                   groupBy={groupBy}
+                  searchQuery={searchQuery}
+                  allStatus={team.allStatus}
                 />
               );
             })}

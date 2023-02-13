@@ -12,7 +12,7 @@ const groupByHelper = {
     }
     return groupTasks;
   },
-  status: async ({ tasks }) => {
+  status: async ({ tasks, teams }) => {
     var groupByStatus = {};
     Object.keys(tasks).forEach((key) => {
       groupByStatus[key] = {};
@@ -27,15 +27,15 @@ const groupByHelper = {
     var finalGroup = {};
     Object.keys(groupByStatus).forEach((key) => {
       finalGroup[key] = [];
-      Object.keys(groupByStatus[key]).forEach((smallKey) => {
+      Object.keys(groupByStatus[key]).forEach((smallKey,index) => {
         finalGroup[key].push({
           groupHeading: smallKey,
-          headingColor: groupByStatus[key][smallKey][0].statusColor,
+          headingColor: teams.length>0 ? teams[index].allStatus[[`${groupByStatus[key][smallKey][0].status}`]]:"",
           tasks: groupByStatus[key][smallKey],
         });
       });
     });
-    // console.log(finalGroup);
+
     return finalGroup;
   },
   assignee: async ({ tasks, allMembers }) => {
@@ -74,7 +74,6 @@ const groupByHelper = {
         });
       });
     });
-    console.log(finalGroup);
     return finalGroup;
   },
   none: ({ tasks }) => {
@@ -89,9 +88,50 @@ const groupByHelper = {
         groupAll[key] = [{ groupHeading: "All Tasks", tasks: tasks[key] }];
       }
     });
-    
+
     return groupAll;
   },
+  priority: ({ tasks }) => {
+    var groupByPriority = {};
+    Object.keys(tasks).forEach((key) => {
+      groupByPriority[key] = {};
+      tasks[key].map((task) => {
+        if (task.priority === null) {
+          if (groupByPriority[key][undefined]) {
+            groupByPriority[key][undefined].push(task);
+          } else {
+            groupByPriority[key][undefined] = [task];
+          }
+        } else if (groupByPriority[key][[`${task.priority}`]]) {
+          groupByPriority[key][[`${task.priority}`]].push(task);
+        } else {
+          groupByPriority[key][`${task.priority}`] = [task];
+        }
+      });
+    });
+
+    var finalGroup = {};
+    Object.keys(groupByPriority).forEach((key) => {
+      finalGroup[key] = [];
+      Object.keys(groupByPriority[key]).forEach((smallKey) => {
+        finalGroup[key].push({
+          groupHeading:
+            groupByPriority[key][smallKey][0].priority || "Unassigned",
+          headingColor: priorities[groupByPriority[key][smallKey][0].priority],
+          tasks: groupByPriority[key][smallKey],
+        });
+      });
+    });
+    return finalGroup;
+  },
+};
+
+const priorities = {
+  Urgent: "#f50000",
+  High: "#ffcc00",
+  Normal: "#6fddff",
+  Low: "#d8d8d8",
+  Clear: "#ff8176",
 };
 
 export default groupByHelper;

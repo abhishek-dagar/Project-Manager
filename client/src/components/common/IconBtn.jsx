@@ -15,6 +15,7 @@ const IconBtn = ({
   avatar_color,
   title,
   sx,
+  sxIcon,
   icon_color,
 }) => {
   const theme = useTheme();
@@ -81,6 +82,7 @@ const IconBtn = ({
                 sx={{
                   fontSize: "1.3rem",
                   color: icon_color ? icon_color : theme.palette.icon.default,
+                  ...sxIcon,
                 }}
               />
             ) : (

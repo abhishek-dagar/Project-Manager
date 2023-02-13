@@ -8,21 +8,15 @@ import {
 } from "@mui/material";
 
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
-import FlagIcon from "@mui/icons-material/Flag";
-import CancelIcon from "@mui/icons-material/Cancel";
+import SquareRoundedIcon from "@mui/icons-material/SquareRounded";
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import IconButton from "../../common/IconBtn";
-import userApi from "../../../api/modules/user.api";
 import taskApi from "../../../api/modules/task.api";
-import DropdownMenu from "../../common/DropdownMenu";
 import { setAllTasks } from "../../../redux/features/teamsSlice";
+import TaskRowCell from "./TaskRowCell";
+import DropdownMenu from "../../common/DropdownMenu";
 
 const TasksRow = ({
   task,
@@ -32,22 +26,28 @@ const TasksRow = ({
   snapshot,
   taskKey,
   groupBy,
+  allStatus,
 }) => {
   const { themeMode } = useSelector((state) => state.themeMode);
-  const { teamsMembersDetail, allTasks } = useSelector((state) => state.teams);
+  const { allMembers, teamsMembersDetail, allTasks } = useSelector(
+    (state) => state.teams
+  );
 
   const dispatch = useDispatch();
 
   const [assignee, setAssignee] = useState();
-  const [priority, setPriority] = useState();
+  const [priority, setPriority] = useState(ta.priority);
+  const [status, setStatus] = useState(ta.status);
   const [anchorElAssignee, setAnchorElAssignee] = useState(null);
   const [anchorElDueDate, setAnchorElDueDate] = useState(null);
   const [anchorElPriority, setAnchorElPriority] = useState(null);
+  const [anchorElStatus, setAnchorElStatus] = useState(null);
 
   const open = [
     Boolean(anchorElAssignee),
     Boolean(anchorElDueDate),
     Boolean(anchorElPriority),
+    Boolean(anchorElStatus),
   ];
   const priorities = {
     Urgent: "red",
@@ -56,7 +56,18 @@ const TasksRow = ({
     Low: "#d8d8d8",
     Clear: "#ff8176",
   };
-  // console.log(priorities[priorities]);
+
+  const handleClickStatus = (event) => {
+    setAnchorElStatus(event.currentTarget);
+  };
+  const handleCloseStatus = () => {
+    setAnchorElStatus(null);
+  };
+
+  const setStatusState = (value) => {
+    // console.log(value);
+    setStatus(value)
+  };
 
   const handleClickAssignee = (event) => {
     setAnchorElAssignee(event.currentTarget);
@@ -66,13 +77,14 @@ const TasksRow = ({
   };
   const setAssigneeState = async (value) => {
     setAssignee(value);
+
+    const newTaObject = JSON.parse(JSON.stringify(ta));
+    newTaObject.assignee = value ? value.id : null;
+
     if (groupBy === "Assignee") {
       const newAllTaskObject = JSON.parse(JSON.stringify(allTasks));
       const newTaskObject = JSON.parse(JSON.stringify(task));
-      const newTaObject = JSON.parse(JSON.stringify(ta));
       const index = task.tasks.indexOf(ta);
-
-      newTaObject.assignee = value ? value.id : null;
 
       newTaskObject.tasks.splice(index, 1);
 
@@ -99,7 +111,6 @@ const TasksRow = ({
       });
 
       if (flag) {
-        console.log(ind);
         newAllTaskObject[taskKey][ind].tasks.push(newTaObject);
         if (newTaskObject.tasks.length === 0) {
           newAllTaskObject[taskKey].splice(indexTask, 1);
@@ -115,13 +126,11 @@ const TasksRow = ({
         });
       }
 
-      console.log("-->", newAllTaskObject);
-
       dispatch(setAllTasks(newAllTaskObject));
-      const { err } = await taskApi.updateTask(newTaObject);
-      if (err) {
-        dispatch(setAllTasks({}));
-      }
+    }
+    const { err } = await taskApi.updateTask(newTaObject);
+    if (err) {
+      dispatch(setAllTasks({}));
     }
   };
   const handleClickPriority = (event) => {
@@ -130,11 +139,69 @@ const TasksRow = ({
   const handleClosePriority = () => {
     setAnchorElPriority(null);
   };
-  const setPriorityState = (value) => {
-    if (value == "Clear") {
-      setPriorityState();
-    } else {
-      setPriority(value);
+  const setPriorityState = async (value) => {
+    value = value === "Clear" ? null : value;
+    setPriority(value);
+
+    const newTaObject = JSON.parse(JSON.stringify(ta));
+    newTaObject.priority = value !== "Clear" ? value : null;
+
+    if (groupBy.toLowerCase() === "priority") {
+      const newAllTaskObject = JSON.parse(JSON.stringify(allTasks));
+      const newTaskObject = JSON.parse(JSON.stringify(task));
+      const index = task.tasks.indexOf(ta);
+
+      newTaskObject.tasks.splice(index, 1);
+
+      var flag = false;
+      var ind = -1;
+      var indexTask = -1;
+      newAllTaskObject[taskKey].map((task, index) => {
+        if (value === task.groupHeading) {
+          flag = true;
+          ind = index;
+          return;
+        }
+        if (value === null && task.groupHeading === "Unassigned") {
+          flag = true;
+          ind = index;
+          return;
+        }
+      });
+
+      newAllTaskObject[taskKey].map((task, index) => {
+        if (newTaskObject.groupHeading === task.groupHeading) {
+          indexTask = index;
+          return;
+        }
+      });
+
+      if (flag) {
+        newAllTaskObject[taskKey][ind].tasks.push(newTaObject);
+        console.log(newTaskObject);
+        if (newTaskObject.tasks.length === 0) {
+          newAllTaskObject[taskKey].splice(indexTask, 1);
+        } else {
+          newAllTaskObject[taskKey].splice(indexTask, 1, newTaskObject);
+        }
+      } else {
+        if (newTaskObject.tasks.length === 0) {
+          newAllTaskObject[taskKey].splice(indexTask, 1);
+        } else {
+          newAllTaskObject[taskKey].splice(indexTask, 1, newTaskObject);
+        }
+        newAllTaskObject[taskKey].push({
+          groupHeading: value,
+          headingColor: priorities[value] || null,
+          tasks: [newTaObject],
+        });
+      }
+
+      dispatch(setAllTasks(newAllTaskObject));
+    }
+    const { err } = await taskApi.updateTask(newTaObject);
+    if (err) {
+      dispatch(setAllTasks({}));
     }
   };
 
@@ -176,15 +243,11 @@ const TasksRow = ({
 
   useEffect(() => {
     const getMember = async () => {
-      const { response, err } = await userApi.getMemberDetail(
-        ta[camelize(tableColHeading[0])]
-      );
-      if (response) {
-        setAssignee(response);
-      }
-      if (err) {
-        setAssignee();
-      }
+      allMembers.map((member) => {
+        if (member.id === ta[camelize(tableColHeading[0])]) {
+          setAssignee(member);
+        }
+      });
     };
     if (ta[camelize(tableColHeading[0])]) {
       getMember();
@@ -257,16 +320,51 @@ const TasksRow = ({
           </ListItemIcon>
         </Stack>
         <Button
-          onClick={() => console.log("Status")}
+          id={"Status"}
+          onClick={handleClickStatus}
+          title={"Status"}
+          aria-controls={open[3] ? "Status" : undefined}
+          aria-haspopup="true"
+          aria-expanded={open[3] ? "true" : undefined}
           sx={{
-            backgroundColor: ta.statusColor,
+            backgroundColor: allStatus[status],
             height: 12,
             minWidth: 12,
             margin: "0 11px",
             padding: 0,
             "&:hover": {
-              backgroundColor: ta.statusColor,
+              backgroundColor: allStatus[status],
             },
+          }}
+        />
+        <DropdownMenu
+          id={"Status-Menu"}
+          btnId={"Status"}
+          handleClose={handleCloseStatus}
+          handelClick={setStatusState}
+          anchorEl={anchorElStatus}
+          open={open[3]}
+          items={Object.keys(allStatus)}
+          icon_color={Object.keys(allStatus).map((key) => allStatus[key])}
+          avatarIcon={SquareRoundedIcon}
+          divider
+          sxMenuList={{
+            padding: 0,
+          }}
+          sxMenu={{
+            width: "100%",
+            margin: "0",
+            "&:hover": {
+              backgroundColor: "#2b343b",
+              borderRadius: "0",
+            },
+          }}
+          sxIcon={{
+            minWidth: "12px",
+            height: "12px",
+          }}
+          sxMenuItem={{
+            fontSize: "12px",
           }}
         />
         <Typography
@@ -281,97 +379,61 @@ const TasksRow = ({
         </Typography>
       </TableCell>
       <TableCell sx={styleCell}>
-        <IconButton
-          id="Assignee"
-          click={handleClickAssignee}
-          handelClick={setAssigneeState}
-          badgeIcon={assignee ? CancelIcon : AddCircleOutlinedIcon}
-          avatarIcon={PersonOutlineOutlinedIcon}
-          outline
-          transparent
-          user={assignee && true}
-          letter={assignee ? assignee.displayName[0] : ""}
-          avatar_color={assignee ? assignee.avatarColor : ""}
-          title={!assignee ? "Assign" : ""}
-          aria-controls={open[0] ? "Assignee" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open[0] ? "true" : undefined}
-        />
-        <DropdownMenu
-          id={"Assignee-Menu"}
-          btnId={"Assignee"}
-          handleClose={handleCloseAssignee}
-          anchorEl={anchorElAssignee}
-          open={open[0]}
-          handelClick={setAssigneeState}
-          search
-          items={
-            teamsMembersDetail[taskKey]
-              ? teamsMembersDetail[taskKey].map((member) => member)
-              : []
-          }
-          colors={
-            teamsMembersDetail[taskKey]
-              ? teamsMembersDetail[taskKey].map((member) => member.avatarColor)
-              : []
-          }
-        />
+        {TaskRowCell[camelize(tableColHeading[0])]({
+          handleClickAssignee,
+          setAssigneeState,
+          assignee,
+          handleCloseAssignee,
+          anchorElAssignee,
+          open,
+          teamsMembersDetail,
+          taskKey,
+          handleClickPriority,
+          priority,
+          priorities,
+          handleClosePriority,
+          setPriorityState,
+          anchorElPriority,
+          ta,
+        })}
       </TableCell>
       <TableCell sx={styleCell}>
-        {ta[camelize(tableColHeading[1])] || (
-          <IconButton
-            click={() => console.log(tableColHeading[1])}
-            avatarIcon={CalendarTodayOutlinedIcon}
-            transparent
-            title={
-              !assignee ||
-              (assignee && !assignee[ta[camelize(tableColHeading[1])]])
-                ? "Due Date"
-                : ""
-            }
-          />
-        )}
+        {TaskRowCell[camelize(tableColHeading[1])]({
+          handleClickAssignee,
+          setAssigneeState,
+          assignee,
+          handleCloseAssignee,
+          anchorElAssignee,
+          open,
+          teamsMembersDetail,
+          taskKey,
+          handleClickPriority,
+          priority,
+          priorities,
+          handleClosePriority,
+          setPriorityState,
+          anchorElPriority,
+          ta,
+        })}
       </TableCell>
       <TableCell sx={styleCell}>
-        <IconButton
-          id={"Priority"}
-          click={handleClickPriority}
-          avatarIcon={priority ? FlagIcon : FlagOutlinedIcon}
-          icon_color={priorities[priority]}
-          transparent
-          title={
-            !assignee ||
-            (assignee && !assignee[ta[camelize(tableColHeading[2])]])
-              ? "Priority"
-              : ""
-          }
-          aria-controls={open[0] ? "Priority" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open[0] ? "true" : undefined}
-        />
-        <DropdownMenu
-          id={"Priority-Menu"}
-          btnId={"Priority"}
-          handleClose={handleClosePriority}
-          handelClick={setPriorityState}
-          anchorEl={anchorElPriority}
-          open={open[2]}
-          items={Object.keys(priorities)}
-          icon_color={Object.keys(priorities).map((key) => priorities[key])}
-          avatarIcon={FlagIcon}
-          divider
-          sxMenuList={{
-            padding: 0,
-          }}
-          sxMenu={{
-            width: "100%",
-            margin: "0",
-            "&:hover": {
-              backgroundColor: "#2b343b",
-              borderRadius: "0",
-            },
-          }}
-        />
+        {TaskRowCell[camelize(tableColHeading[2])]({
+          handleClickAssignee,
+          setAssigneeState,
+          assignee,
+          handleCloseAssignee,
+          anchorElAssignee,
+          open,
+          teamsMembersDetail,
+          taskKey,
+          handleClickPriority,
+          priority,
+          priorities,
+          handleClosePriority,
+          setPriorityState,
+          anchorElPriority,
+          ta,
+        })}
       </TableCell>
     </TableRow>
   );

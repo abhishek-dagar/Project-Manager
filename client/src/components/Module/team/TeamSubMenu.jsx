@@ -21,6 +21,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import WidgetsOutlinedIcon from "@mui/icons-material/WidgetsOutlined";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -28,17 +29,17 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { setTeamModal } from "../../../redux/features/teamsSlice";
 
-const SingleLevel = ({ team, sx, component, to, icon, click }) => {
+const SingleLevel = ({ team, sx, component, to, Icon, click }) => {
   return (
     <ListItemButton component={component} to={to} sx={sx} onClick={click}>
-      {icon && (
+      {Icon && (
         <ListItemIcon
           sx={{
             justifyContent: "flex-start",
             minWidth: "35px",
           }}
         >
-          <WidgetsOutlinedIcon />
+          <Icon />
         </ListItemIcon>
       )}
       <ListItemText primary={team.teamName} />
@@ -144,6 +145,7 @@ const MultiLevel = ({ team, teams, teamId, queryString }) => {
                       team={team}
                       component={Link}
                       to={`/teams/${team.id}`}
+                      Icon={PeopleOutlineIcon}
                       sx={{
                         backgroundColor:
                           teamId === team.id && theme.palette.primary.main,
@@ -295,6 +297,7 @@ const TeamSubMenu = ({
                 placeholder="search"
                 variant="outlined"
                 onChange={onChange}
+                autoComplete={"off"}
                 size="small"
                 autoFocus
                 InputProps={{
@@ -326,7 +329,7 @@ const TeamSubMenu = ({
           component={Link}
           to={`/teams`}
           team={{ teamName: "Everything" }}
-          icon
+          Icon={WidgetsOutlinedIcon}
           sx={{
             backgroundColor: !teamId && theme.palette.primary.main,
             borderRadius: "4px",
